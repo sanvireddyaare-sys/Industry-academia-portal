@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Builder - IAP Portal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <div class="nav-brand">Industry Academia Portal</div>
+        <div class="nav-links">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="projects.html">Projects</a>
+            <a href="courses.html">Courses</a>
+            <a href="tests.html">Tests</a>
+            <a href="events.html">Events</a>
+            <a href="profile.html">Profile</a>
+        </div>
+        <button id="logoutBtn" class="btn btn-ghost">Logout</button>
+    </nav>
+
+    <main class="page-wrap">
+        <div id="pageAlert" class="alert alert-info"></div>
+
+        <section class="page-header">
+            <div>
+                <span class="eyebrow">Resume Builder</span>
+                <h1>Create your professional resume</h1>
+                <p>Complete the form and preview a polished resume instantly.</p>
+            </div>
+        </section>
+
+        <section class="content-grid">
+            <div class="card action-panel">
+                <h2>Build your resume</h2>
+                <form id="resumeForm">
+                    <label>Full name</label>
+                    <input type="text" id="resumeName" placeholder="Your name" required>
+                    <label>Title</label>
+                    <input type="text" id="resumeTitle" placeholder="Your job title" required>
+                    <label>Summary</label>
+                    <textarea id="resumeSummary" placeholder="Brief professional summary" required></textarea>
+                    <label>Education</label>
+                    <textarea id="resumeEducation" placeholder="Degree or certifications" required></textarea>
+                    <label>Experience</label>
+                    <textarea id="resumeExperience" placeholder="Projects or roles" required></textarea>
+                    <button type="submit" class="btn btn-primary">Update Preview</button>
+                </form>
+            </div>
+            <div class="card">
+                <h2>Preview</h2>
+                <div id="resumePreview" class="resume-preview">
+                    <p class="placeholder-text">Fill the form to see your resume preview here.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js"></script>
+</body>
+</html>

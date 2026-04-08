@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tests - IAP Portal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <div class="nav-brand">Industry Academia Portal</div>
+        <div class="nav-links">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="projects.html">Projects</a>
+            <a href="courses.html">Courses</a>
+            <a href="tests.html">Tests</a>
+            <a href="events.html">Events</a>
+            <a href="profile.html">Profile</a>
+        </div>
+        <button id="logoutBtn" class="btn btn-ghost">Logout</button>
+    </nav>
+
+    <main class="page-wrap">
+        <div id="pageAlert" class="alert alert-info"></div>
+
+        <section class="page-header">
+            <div>
+                <span class="eyebrow">Skill Assessments</span>
+                <h1>Take tests and review skills</h1>
+                <p>Attempt MCQ assessments, get instant results, and track your growth.</p>
+            </div>
+        </section>
+
+        <section id="testCreatePanel" class="card-grid hidden"></section>
+        <section id="testOverview" class="card-grid"></section>
+        <section id="companyScorePanel" class="card-grid hidden">
+            <div class="card">
+                <h2>Student Test Scores</h2>
+                <p>Filter and search student performance across all tests.</p>
+                <div class="search-filter-panel">
+                    <input type="text" id="studentSearch" placeholder="Search by student name, college, or organization..." class="search-input">
+                    <button type="button" id="scoreSearchBtn" class="btn btn-secondary">Search</button>
+                    <select id="scoreTestFilter" class="filter-select">
+                        <option value="all">All Tests</option>
+                    </select>
+                    <input type="number" id="scoreMinFilter" placeholder="Min score %" class="filter-input" min="0" max="100" value="0">
+                </div>
+                <section id="scoreboardList" class="card-grid"></section>
+            </div>
+        </section>
+        <section id="testRunner" class="card hidden"></section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js"></script>
+</body>
+</html>

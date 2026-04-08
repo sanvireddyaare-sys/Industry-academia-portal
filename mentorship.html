@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentorship - IAP Portal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <div class="nav-brand">Industry Academia Portal</div>
+        <div class="nav-links">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="projects.html">Projects</a>
+            <a href="courses.html">Courses</a>
+            <a href="tests.html">Tests</a>
+            <a href="events.html">Events</a>
+            <a href="profile.html">Profile</a>
+        </div>
+        <button id="logoutBtn" class="btn btn-ghost">Logout</button>
+    </nav>
+
+    <main class="page-wrap">
+        <div id="pageAlert" class="alert alert-info"></div>
+
+        <section class="page-header">
+            <div>
+                <span class="eyebrow">Mentorship</span>
+                <h1>Request guidance</h1>
+                <p>Connect with mentors, review requests, and keep mentorship conversations moving.</p>
+            </div>
+        </section>
+
+        <!-- Mentor profile panel (for company/faculty) -->
+        <section id="mentorProfilePanel" class="card-grid hidden"></section>
+
+        <!-- Browse mentors panel (for students) -->
+        <section id="browseMentorsPanel" class="card-grid hidden">
+            <div class="card">
+                <h2>Find a mentor</h2>
+                <p>Browse available mentors and request guidance on career development and technical skills.</p>
+                <div class="search-filter-panel">
+                    <input type="text" id="mentorSearch" placeholder="Search mentors by name, expertise, or organization..." class="search-input">
+                    <select id="expertiseFilter" class="filter-select">
+                        <option value="">All expertise areas</option>
+                        <option value="technical">Technical Skills</option>
+                        <option value="career">Career Development</option>
+                        <option value="leadership">Leadership</option>
+                        <option value="product">Product Management</option>
+                        <option value="design">Design & UX</option>
+                        <option value="business">Business Strategy</option>
+                    </select>
+                    <button type="button" id="searchMentorsBtn" class="btn btn-secondary">Search</button>
+                </div>
+                <div id="mentorsList" class="card-grid"></div>
+            </div>
+        </section>
+
+        <!-- Mentorship requests panel (for mentors) -->
+        <section id="mentorRequestsPanel" class="card-grid hidden">
+            <div class="card">
+                <h2>Mentorship requests</h2>
+                <p>Manage incoming requests from students seeking your guidance.</p>
+                <div id="requestsList" class="panel-list"></div>
+            </div>
+        </section>
+
+        <!-- Active mentorships & messaging -->
+        <section id="activeMentorshipsPanel" class="card-grid hidden">
+            <div class="card">
+                <h2>Active mentorships & messaging</h2>
+                <div id="mentorshipsList" class="panel-list"></div>
+            </div>
+        </section>
+
+        <!-- Messaging panel -->
+        <section id="messagingPanel" class="card hidden">
+            <div id="messageHeader" class="message-header"></div>
+            <div id="messageThread" class="message-thread"></div>
+            <form id="messageForm" class="message-form hidden">
+                <textarea id="messageInput" placeholder="Type your message..." required></textarea>
+                <button type="submit" class="btn btn-primary">Send message</button>
+            </form>
+            <button type="button" id="closeMsgBtn" class="btn btn-ghost">Close</button>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js"></script>
+</body>
+</html>

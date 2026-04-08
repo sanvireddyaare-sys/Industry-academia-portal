@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forum - IAP Portal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <div class="nav-brand">Industry Academia Portal</div>
+        <div class="nav-links">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="projects.html">Projects</a>
+            <a href="courses.html">Courses</a>
+            <a href="tests.html">Tests</a>
+            <a href="events.html">Events</a>
+            <a href="profile.html">Profile</a>
+        </div>
+        <button id="logoutBtn" class="btn btn-ghost">Logout</button>
+    </nav>
+
+    <main class="page-wrap">
+        <div id="pageAlert" class="alert alert-info"></div>
+
+        <section class="page-header">
+            <div>
+                <span class="eyebrow">Discussion Forum</span>
+                <h1>Share ideas and ask questions</h1>
+                <p>Create posts, comment on threads, and keep conversations organized.</p>
+            </div>
+        </section>
+
+        <section class="card action-panel">
+            <h2>Create a new post</h2>
+            <form id="forumForm">
+                <label>Post title</label>
+                <input type="text" id="postTitle" placeholder="Enter a title" required>
+                <label>Post content</label>
+                <textarea id="postContent" placeholder="Share your question or idea" required></textarea>
+                <button type="submit" class="btn btn-primary">Publish post</button>
+            </form>
+        </section>
+
+        <section id="forumThreads" class="card-grid"></section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js"></script>
+</body>
+</html>

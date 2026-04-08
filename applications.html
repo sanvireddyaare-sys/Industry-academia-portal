@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Applications - IAP Portal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <div class="nav-brand">Industry Academia Portal</div>
+        <div class="nav-links">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="projects.html">Projects</a>
+            <a href="applications.html">Applications</a>
+            <a href="courses.html">Courses</a>
+            <a href="tests.html">Tests</a>
+            <a href="events.html">Events</a>
+            <a href="profile.html">Profile</a>
+        </div>
+        <button id="logoutBtn" class="btn btn-ghost">Logout</button>
+    </nav>
+
+    <main class="page-wrap">
+        <div id="pageAlert" class="alert alert-info"></div>
+
+        <section class="page-header">
+            <div>
+                <span class="eyebrow">Applications</span>
+                <h1>Track project submissions</h1>
+                <p>View application status, feedback and submission details for your projects.</p>
+            </div>
+        </section>
+
+        <section class="card-grid" id="applicationsList"></section>
+
+        <!-- Review Modal -->
+        <div id="reviewModal" class="modal hidden">
+            <div class="modal-content">
+                <span class="modal-close">&times;</span>
+                <h2>Review Application</h2>
+                <form id="reviewForm">
+                    <div class="form-group">
+                        <label for="reviewStatus">Status</label>
+                        <select id="reviewStatus" required>
+                            <option value="Pending">Pending</option>
+                            <option value="Under Review">Under Review</option>
+                            <option value="Accepted">Accepted</option>
+                            <option value="Rejected">Rejected</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="reviewFeedback">Feedback</label>
+                        <textarea id="reviewFeedback" placeholder="Provide detailed feedback for the applicant" rows="4"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Review</button>
+                </form>
+            </div>
+        </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js"></script>
+</body>
+</html>

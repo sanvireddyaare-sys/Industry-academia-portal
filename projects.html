@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects - IAP Portal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <div class="nav-brand">Industry Academia Portal</div>
+        <div class="nav-links">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="projects.html">Projects</a>
+            <a href="applications.html">Applications</a>
+            <a href="courses.html">Courses</a>
+            <a href="tests.html">Tests</a>
+            <a href="events.html">Events</a>
+            <a href="profile.html">Profile</a>
+        </div>
+        <button id="logoutBtn" class="btn btn-ghost">Logout</button>
+    </nav>
+
+    <main class="page-wrap">
+        <div id="pageAlert" class="alert alert-info"></div>
+
+        <section class="page-header">
+            <div>
+                <span class="eyebrow">Live Projects</span>
+                <h1>Browse industry initiatives</h1>
+                <p>View available projects, submit applications, and manage company assignments.</p>
+            </div>
+        </section>
+
+        <section class="content-grid">
+            <div class="card">
+                <div class="section-heading">
+                    <h2>Active projects</h2>
+                    <p>Projects are powered by company teams and updated in real time.</p>
+                </div>
+
+                <!-- Search and Filter Section -->
+                <div class="search-filter-section">
+                    <div class="search-bar">
+                        <input type="text" id="projectSearch" placeholder="Search projects by title, description, or company...">
+                        <button type="button" id="searchBtn" class="btn btn-secondary">Search</button>
+                    </div>
+                    <div class="filter-options">
+                        <select id="statusFilter">
+                            <option value="all">All Projects</option>
+                            <option value="active">Active Only</option>
+                            <option value="deadline">Has Deadline</option>
+                        </select>
+                        <select id="sortFilter">
+                            <option value="newest">Newest First</option>
+                            <option value="oldest">Oldest First</option>
+                            <option value="deadline">By Deadline</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="projectsList" class="card-grid"></div>
+            </div>
+            <div id="projectFormPanel" class="card action-panel hidden">
+                <h2>Post a new project</h2>
+                <form id="projectForm">
+                    <label>Title</label>
+                    <input type="text" id="projectTitle" placeholder="Project title" required>
+                    <label>Description</label>
+                    <textarea id="projectDescription" placeholder="Describe the project" required></textarea>
+                    <label>Deadline</label>
+                    <input type="date" id="projectDeadline" required>
+                    <button type="submit" class="btn btn-primary">Publish Project</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Application Modal -->
+        <div id="applyModal" class="modal hidden">
+            <div class="modal-content">
+                <span class="modal-close">&times;</span>
+                <h2>Apply for Project</h2>
+                <form id="applyForm">
+                    <div class="form-group">
+                        <label for="submissionLink">Submission Link</label>
+                        <input type="url" id="submissionLink" placeholder="GitHub, Drive, or demo URL" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="submissionDescription">Project Description</label>
+                        <textarea id="submissionDescription" placeholder="Describe your approach, technologies used, and what you've accomplished" rows="4" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="projectFile">Upload Project File (optional)</label>
+                        <input type="file" id="projectFile" accept=".zip,.pdf,.doc,.docx,.ppt,.pptx">
+                        <small>Supported formats: ZIP, PDF, DOC, DOCX, PPT, PPTX (max 10MB)</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Application</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interviews - IAP Portal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <div class="nav-brand">Industry Academia Portal</div>
+        <div class="nav-links">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="projects.html">Projects</a>
+            <a href="courses.html">Courses</a>
+            <a href="tests.html">Tests</a>
+            <a href="events.html">Events</a>
+            <a href="profile.html">Profile</a>
+        </div>
+        <button id="logoutBtn" class="btn btn-ghost">Logout</button>
+    </nav>
+
+    <main class="page-wrap">
+        <div id="pageAlert" class="alert alert-info"></div>
+
+        <section class="page-header">
+            <div>
+                <span class="eyebrow">Interview Scheduling</span>
+                <h1>Manage interview invites</h1>
+                <p>Review upcoming interview schedules and join meetings on time.</p>
+            </div>
+        </section>
+
+        <section class="card-grid">
+            <div id="interviewNotificationPanel" class="card hidden">
+                <h2>Interview notifications</h2>
+                <div id="interviewNotifications" class="panel-list"></div>
+            </div>
+            <div id="interviewCalendarPanel" class="card hidden">
+                <h2>Interview calendar</h2>
+                <div id="interviewCalendar" class="calendar-grid"></div>
+            </div>
+            <div class="card">
+                <h2>Upcoming interviews</h2>
+                <div id="interviewsList" class="panel-list"></div>
+            </div>
+            <div id="interviewFormPanel" class="card action-panel hidden">
+                <h2>Schedule an interview</h2>
+                <form id="interviewForm">
+                    <label>Student email</label>
+                    <input type="email" id="interviewStudent" placeholder="Student email" required>
+                    <label>Date</label>
+                    <input type="date" id="interviewDate" required>
+                    <label>Time</label>
+                    <input type="time" id="interviewTime" required>
+                    <label>Meeting link</label>
+                    <input type="url" id="interviewLink" placeholder="https://" required>
+                    <button type="submit" class="btn btn-primary">Schedule Interview</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js"></script>
+</body>
+</html>

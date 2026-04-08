@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - IAP Portal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <div class="nav-brand">Industry Academia Portal</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="signup.html">Sign Up</a>
+        </div>
+        <div class="nav-cta">
+            <a class="btn btn-secondary" href="signup.html">Create an account</a>
+        </div>
+    </nav>
+
+    <main class="page-wrap auth-page">
+        <section class="auth-card card">
+            <span class="eyebrow">Welcome Back</span>
+            <h1>Sign in to your account</h1>
+            <p>Access your dashboard for projects, tests, courses, events, and mentorship.</p>
+            <div id="pageAlert" class="alert alert-info"></div>
+            <form id="loginForm" class="action-panel">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Sign In</button>
+            </form>
+            <div class="divider"><span>New here?</span></div>
+            <div class="link-group">
+                <p>Start your journey <a href="signup.html">Create an account</a></p>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js"></script>
+</body>
+</html>

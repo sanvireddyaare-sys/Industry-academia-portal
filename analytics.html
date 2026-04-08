@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics - IAP Portal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <div class="nav-brand">Industry Academia Portal</div>
+        <div class="nav-links">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="projects.html">Projects</a>
+            <a href="courses.html">Courses</a>
+            <a href="tests.html">Tests</a>
+            <a href="events.html">Events</a>
+            <a href="profile.html">Profile</a>
+        </div>
+        <button id="logoutBtn" class="btn btn-ghost">Logout</button>
+    </nav>
+
+    <main class="page-wrap">
+        <div id="pageAlert" class="alert alert-info"></div>
+
+        <section class="page-header">
+            <div>
+                <span class="eyebrow">Analytics</span>
+                <h1>Understand the platform metrics</h1>
+                <p>View application counts, success rates and activity summaries across your network.</p>
+            </div>
+        </section>
+
+        <section class="card-grid">
+            <div class="stat-card card">
+                <h3>Total projects</h3>
+                <p id="metricProjects">0</p>
+            </div>
+            <div class="stat-card card">
+                <h3>Applications</h3>
+                <p id="metricApplications">0</p>
+            </div>
+            <div class="stat-card card">
+                <h3>Completed tests</h3>
+                <p id="metricTests">0</p>
+            </div>
+        </section>
+
+        <section class="card chart-card">
+            <h2>Performance overview</h2>
+            <div class="chart" id="analyticsChart"></div>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js"></script>
+</body>
+</html>

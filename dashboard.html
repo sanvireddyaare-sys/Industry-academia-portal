@@ -1,0 +1,51 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - IAP Portal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <div class="nav-brand">Industry Academia Portal</div>
+        <div class="nav-links">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="projects.html">Projects</a>
+            <a href="applications.html">Applications</a>
+            <a href="courses.html">Courses</a>
+            <a href="tests.html">Tests</a>
+            <a href="events.html">Events</a>
+            <a href="profile.html">Profile</a>
+        </div>
+        <button id="logoutBtn" class="btn btn-ghost">Logout</button>
+    </nav>
+
+    <main class="page-wrap">
+        <div id="pageAlert" class="alert alert-info"></div>
+        <section class="page-header">
+            <div>
+                <span class="eyebrow">Dashboard</span>
+                <h1>Welcome to your portal</h1>
+                <p>Access live projects, applications, tests, events, and analytics from one place.</p>
+            </div>
+        </section>
+
+        <section class="card-grid" id="dashboardStats"></section>
+
+        <section class="content-grid">
+            <div class="card">
+                <h2>Recent activity</h2>
+                <div id="dashboardActivity" class="panel-list"></div>
+            </div>
+            <div class="card">
+                <h2>Your profile</h2>
+                <div id="dashboardRole" class="panel-list"></div>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js"></script>
+</body>
+</html>
