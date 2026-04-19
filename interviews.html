@@ -8,17 +8,35 @@
 </head>
 <body>
     <nav class="main-nav">
+    <div class="nav-container">
+
+        <!-- Logo -->
         <div class="nav-brand">Industry Academia Portal</div>
+
+        <!-- Links -->
         <div class="nav-links">
             <a href="dashboard.html">Dashboard</a>
             <a href="projects.html">Projects</a>
+            <a href="applications.html">Applications</a>
             <a href="courses.html">Courses</a>
             <a href="tests.html">Tests</a>
             <a href="events.html">Events</a>
+            <a href="mentorship.html">Mentorship</a>
+            <a href="resume.html">Resume</a>
+            <a href="forum.html">Forum</a>
             <a href="profile.html">Profile</a>
         </div>
-        <button id="logoutBtn" class="btn btn-ghost">Logout</button>
-    </nav>
+
+        <!-- Right Side -->
+        <div class="nav-right">
+            <div class="notification-box" onclick="toggleNotif()">
+                🔔 <span id="notifCount" class="badge">0</span>
+            </div>
+            <button id="logoutBtn" class="btn btn-ghost">Logout</button>
+        </div>
+
+    </div>
+</nav>
 
     <main class="page-wrap">
         <div id="pageAlert" class="alert alert-info"></div>
@@ -62,6 +80,7 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

@@ -7,8 +7,15 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
+    <!-- ✅ NAVBAR -->
     <nav class="main-nav">
+    <div class="nav-container">
+
+        <!-- Logo -->
         <div class="nav-brand">Industry Academia Portal</div>
+
+        <!-- Links -->
         <div class="nav-links">
             <a href="dashboard.html">Dashboard</a>
             <a href="projects.html">Projects</a>
@@ -16,14 +23,32 @@
             <a href="courses.html">Courses</a>
             <a href="tests.html">Tests</a>
             <a href="events.html">Events</a>
+            <a href="mentorship.html">Mentorship</a>
+            <a href="resume.html">Resume</a>
+            <a href="forum.html">Forum</a>
             <a href="profile.html">Profile</a>
         </div>
-        <button id="logoutBtn" class="btn btn-ghost">Logout</button>
-    </nav>
+
+        <!-- Right Side -->
+        <div class="nav-right">
+            <div class="notification-box" onclick="toggleNotif()">
+                🔔 <span id="notifCount" class="badge">0</span>
+            </div>
+            <button id="logoutBtn" class="btn btn-ghost">Logout</button>
+        </div>
+
+    </div>
+</nav>
+
+    <!-- 🔔 NOTIFICATION PANEL -->
+    <div id="notifPanel" class="hidden">
+        <div id="notificationsList"></div>
+    </div>
 
     <main class="page-wrap">
         <div id="pageAlert" class="alert alert-info"></div>
 
+        <!-- HEADER -->
         <section class="page-header">
             <div>
                 <span class="eyebrow">Applications</span>
@@ -32,13 +57,26 @@
             </div>
         </section>
 
-        <section class="card-grid" id="applicationsList"></section>
+        <!-- 🎯 FILTER SECTION -->
+        <section class="card">
+            <h3>Filter Students by College</h3>
 
-        <!-- Review Modal -->
+            <select id="filterCollege" class="filter-select"></select>
+
+            <button onclick="filterStudents()" class="btn btn-primary">
+                Filter
+            </button>
+        </section>
+
+        <!-- 📋 APPLICATION LIST -->
+        <section id="applicationsList" class="card-grid"></section>
+
+        <!-- 📝 REVIEW MODAL -->
         <div id="reviewModal" class="modal hidden">
             <div class="modal-content">
                 <span class="modal-close">&times;</span>
                 <h2>Review Application</h2>
+
                 <form id="reviewForm">
                     <div class="form-group">
                         <label for="reviewStatus">Status</label>
@@ -50,16 +88,25 @@
                             <option value="Completed">Completed</option>
                         </select>
                     </div>
+
                     <div class="form-group">
                         <label for="reviewFeedback">Feedback</label>
                         <textarea id="reviewFeedback" placeholder="Provide detailed feedback for the applicant" rows="4"></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary">Submit Review</button>
+
+                    <button type="submit" class="btn btn-primary">
+                        Submit Review
+                    </button>
                 </form>
             </div>
         </div>
 
+    </main>
+
+    <!-- ✅ SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
     <script src="script.js"></script>
+
 </body>
 </html>

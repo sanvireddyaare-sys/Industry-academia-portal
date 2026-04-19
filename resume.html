@@ -7,18 +7,37 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
     <nav class="main-nav">
+    <div class="nav-container">
+
+        <!-- Logo -->
         <div class="nav-brand">Industry Academia Portal</div>
+
+        <!-- Links -->
         <div class="nav-links">
             <a href="dashboard.html">Dashboard</a>
             <a href="projects.html">Projects</a>
+            <a href="applications.html">Applications</a>
             <a href="courses.html">Courses</a>
             <a href="tests.html">Tests</a>
             <a href="events.html">Events</a>
+            <a href="mentorship.html">Mentorship</a>
+            <a href="resume.html">Resume</a>
+            <a href="forum.html">Forum</a>
             <a href="profile.html">Profile</a>
         </div>
-        <button id="logoutBtn" class="btn btn-ghost">Logout</button>
-    </nav>
+
+        <!-- Right Side -->
+        <div class="nav-right">
+            <div class="notification-box" onclick="toggleNotif()">
+                🔔 <span id="notifCount" class="badge">0</span>
+            </div>
+            <button id="logoutBtn" class="btn btn-ghost">Logout</button>
+        </div>
+
+    </div>
+</nav>
 
     <main class="page-wrap">
         <div id="pageAlert" class="alert alert-info"></div>
@@ -27,37 +46,82 @@
             <div>
                 <span class="eyebrow">Resume Builder</span>
                 <h1>Create your professional resume</h1>
-                <p>Complete the form and preview a polished resume instantly.</p>
+                <p>Build, preview, analyze, and upload your resume.</p>
             </div>
         </section>
 
         <section class="content-grid">
+
+            <!-- LEFT: FORM -->
             <div class="card action-panel">
                 <h2>Build your resume</h2>
+
                 <form id="resumeForm">
                     <label>Full name</label>
                     <input type="text" id="resumeName" placeholder="Your name" required>
+
                     <label>Title</label>
                     <input type="text" id="resumeTitle" placeholder="Your job title" required>
+
                     <label>Summary</label>
                     <textarea id="resumeSummary" placeholder="Brief professional summary" required></textarea>
+
                     <label>Education</label>
                     <textarea id="resumeEducation" placeholder="Degree or certifications" required></textarea>
+
                     <label>Experience</label>
                     <textarea id="resumeExperience" placeholder="Projects or roles" required></textarea>
-                    <button type="submit" class="btn btn-primary">Update Preview</button>
+
+                    <button type="submit" class="btn btn-primary">
+                        Update Preview
+                    </button>
                 </form>
             </div>
+
+            <!-- RIGHT: PREVIEW + UPLOAD -->
             <div class="card">
+
                 <h2>Preview</h2>
+
                 <div id="resumePreview" class="resume-preview">
-                    <p class="placeholder-text">Fill the form to see your resume preview here.</p>
+                    <p class="placeholder-text">
+                        Fill the form to see your resume preview here.
+                    </p>
                 </div>
+
+                <!-- ANALYSIS -->
+                <div class="card" style="margin-top: 15px;">
+                    <h3>Resume Analysis</h3>
+                    <div id="analysisResult" class="panel-list">
+                        <p class="placeholder-text">Analysis will appear here.</p>
+                    </div>
+                </div>
+
+                <!-- UPLOAD -->
+                <div class="resume-upload-section">
+                    <h3>Upload your resume</h3>
+
+                    <form id="resumeUploadForm" class="action-panel">
+                        <label for="resumeFile">Resume PDF</label>
+                        <input type="file" id="resumeFile" accept="application/pdf" />
+
+                        <button type="submit" class="btn btn-secondary">
+                            Upload Resume
+                        </button>
+                    </form>
+
+                    <div id="resumeUploadResult" class="panel-list"></div>
+                </div>
+
             </div>
+
         </section>
+
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
     <script src="script.js"></script>
+
 </body>
 </html>

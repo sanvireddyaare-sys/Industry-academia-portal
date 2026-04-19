@@ -1,9 +1,4 @@
-﻿const SUPABASE_URL = 'https://mrytsgemfksbqlsxmxkr.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1yeXRzZ2VtZmtzYnFsc3hteGtyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1NDg3NjMsImV4cCI6MjA5MTEyNDc2M30.B1ipLC0AjHgUBCx5BadMvc5WootlsF3JWWi7qeMWwpo';
-
-const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
-let profilePageListenersBound = false;
-
+﻿let profilePageListenersBound = false;
 function findAlert() {
     return document.getElementById('pageAlert') || document.getElementById('errorAlert') || document.getElementById('successAlert') || document.getElementById('infoAlert');
 }
@@ -76,7 +71,86 @@ async function handleLogin(event) {
         console.error(error);
     }
 }
+async function addCertificate() {
+    const title = document.getElementById("certTitle").value;
+    const link = document.getElementById("certLink").value;
 
+    const { data: { user } } = await supabaseClient.auth.getUser();
+
+    const { error } = await supabaseClient
+        .from("certificates")
+        .insert([{
+            student_id: user.id,
+            title: title,
+            certificate_url: link
+        }]);
+
+    if (error) {
+        console.error(error);
+        showAlert("Failed to add certificate", "error");
+        return;
+    }
+
+    showAlert("Certificate added!", "success");
+    loadCertificates();
+}
+async function loadCertificates() {
+    const { data, error } = await supabaseClient
+        .from("certificates")
+        .select("*");
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
+    document.getElementById("certList").innerHTML = data.map(c => `
+        <div class="card">
+            <h4>${c.title}</h4>
+            <a href="${c.certificate_url}" target="_blank">View</a>
+        </div>
+    `).join('');
+}
+async function addAchievement() {
+    const title = document.getElementById("achTitle").value;
+    const desc = document.getElementById("achDesc").value;
+
+    const { data: { user } } = await supabaseClient.auth.getUser();
+
+    const { error } = await supabaseClient
+        .from("achievements")
+        .insert([{
+            student_id: user.id,
+            title: title,
+            description: desc
+        }]);
+
+    if (error) {
+        console.error(error);
+        showAlert("Failed to add achievement", "error");
+        return;
+    }
+
+    showAlert("Achievement added!", "success");
+    loadAchievements();
+}
+async function loadAchievements() {
+    const { data, error } = await supabaseClient
+        .from("achievements")
+        .select("*");
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
+    document.getElementById("achList").innerHTML = data.map(a => `
+        <div class="card">
+            <h4>${a.title}</h4>
+            <p>${a.description}</p>
+        </div>
+    `).join('');
+}
 async function handleSignup(event) {
     event.preventDefault();
     clearAlert();
@@ -126,7 +200,7 @@ async function handleSignup(event) {
     }
 
     try {
-        const { data, error } = await supabaseClient.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
             email,
             password,
             options: {
@@ -146,7 +220,7 @@ async function handleSignup(event) {
         }
 
         if (data?.user?.id) {
-            await supabaseClient.from('profiles').upsert({
+            await supabase.from('profiles').upsert({
                 id: data.user.id,
                 name,
                 email,
@@ -170,7 +244,7 @@ async function handleSignup(event) {
 
 async function handleLogout() {
     try {
-        await supabaseClient.auth.signOut();
+        await supabase.auth.signOut();
         window.location.href = 'login.html';
     } catch (error) {
         console.error('Logout failed:', error);
@@ -179,9 +253,9 @@ async function handleLogout() {
 }
 
 async function checkAuthStatus() {
-    if (!supabaseClient) return null;
+    if (!supabase) return null;
     try {
-        const { data } = await supabaseClient.auth.getUser();
+        const { data } = await supabase.auth.getUser();
         return data?.user || null;
     } catch (error) {
         console.error('Auth status check failed:', error);
@@ -192,12 +266,12 @@ async function checkAuthStatus() {
 async function fetchProfile(userId) {
     if (!userId) return null;
     try {
-        const { data, error } = await supabaseClient.from('profiles').select('*').eq('id', userId).maybeSingle();
+        const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle();
         if (error) {
             console.warn('Profile fetch error:', error.message || error);
         }
 
-        const { data: userData, error: userError } = await supabaseClient.auth.getUser();
+        const { data: userData, error: userError } = await supabase.auth.getUser();
         if (userError || !userData?.user) {
             console.warn('Unable to load auth user for profile fallback.', userError);
             return data || null;
@@ -219,7 +293,7 @@ async function fetchProfile(userId) {
         if (data) {
             const shouldUpdate = !data.name || !data.role || !data.organization || !data.college || !data.phone;
             if (shouldUpdate) {
-                const { error: updateError } = await supabaseClient.from('profiles').upsert(fallback);
+                const { error: updateError } = await supabase.from('profiles').upsert(fallback);
                 if (updateError) {
                     console.warn('Profile fallback update failed:', updateError);
                 }
@@ -227,7 +301,7 @@ async function fetchProfile(userId) {
             return fallback;
         }
 
-        const { error: upsertError } = await supabaseClient.from('profiles').upsert(fallback);
+        const { error: upsertError } = await supabase.from('profiles').upsert(fallback);
         if (upsertError) {
             console.warn('Profile fallback upsert failed:', upsertError);
             return fallback;
@@ -345,6 +419,7 @@ async function initializeDashboardPage(user) {
 
         activity.innerHTML = recent.map(item => `<div class="panel-item"><p>${item}</p></div>`).join('');
     }
+    await loadNotifications(user);
 }
 
 function renderCards(container, items) {
@@ -373,6 +448,7 @@ function buildProjectCard(project, user, profile) {
             <div class="project-header">
                 <h3>${project.title}</h3>
                 ${statusBadge}
+                
             </div>
             <p>${project.description || 'Description not available.'}</p>
             <small>${deadlineText}</small>
@@ -381,35 +457,6 @@ function buildProjectCard(project, user, profile) {
         </article>
     `;
 }
-
-async function initializeProjectsPage(user) {
-    const profile = await fetchProfile(user.id);
-    const projectList = document.getElementById('projectsList');
-    const projectFormPanel = document.getElementById('projectFormPanel');
-
-    if (profile?.role === 'company' && projectFormPanel) {
-        projectFormPanel.classList.remove('hidden');
-        const form = document.getElementById('projectForm');
-        form?.addEventListener('submit', async event => {
-            event.preventDefault();
-            clearAlert();
-            const title = document.getElementById('projectTitle')?.value.trim();
-            const description = document.getElementById('projectDescription')?.value.trim();
-            const deadline = document.getElementById('projectDeadline')?.value;
-            if (!title || !description || !deadline) {
-                showAlert('Complete all project fields.', 'error');
-                return;
-            }
-            const { error } = await supabaseClient.from('projects').insert([{ title, description, deadline, company_id: user.id }]);
-            if (error) {
-                showAlert('Unable to publish project.', 'error');
-                return;
-            }
-            showAlert('Project published successfully.', 'success');
-            form.reset();
-            await initializeProjectsPage(user);
-        });
-    }
 
 async function initializeProjectsPage(user) {
     const profile = await fetchProfile(user.id);
@@ -465,6 +512,8 @@ async function loadAndDisplayProjects(user, profile, searchTerm = '', statusFilt
     }
 
     const { data: projects, error } = await query;
+
+console.log("Projects from DB:", projects); 
     if (error) {
         console.error('Projects fetch failed:', error);
         projectList.innerHTML = '<p class="placeholder-text">Unable to load projects.</p>';
@@ -488,15 +537,17 @@ async function loadAndDisplayProjects(user, profile, searchTerm = '', statusFilt
     }
 
     // Search filter
-    if (searchTerm) {
-        const term = searchTerm.toLowerCase();
-        filteredProjects = filteredProjects.filter(project =>
-            project.title.toLowerCase().includes(term) ||
-            project.description.toLowerCase().includes(term) ||
-            (project.profiles?.name && project.profiles.name.toLowerCase().includes(term)) ||
-            (project.profiles?.organization && project.profiles.organization.toLowerCase().includes(term))
-        );
-    }
+    // Search filter
+if (searchTerm) {
+    const term = searchTerm.toLowerCase().trim();
+
+    filteredProjects = filteredProjects.filter(project =>
+        (project.title && project.title.toLowerCase().includes(term)) ||
+        (project.description && project.description.toLowerCase().includes(term)) ||
+        (project.profiles?.name && project.profiles.name.toLowerCase().includes(term)) ||
+        (project.profiles?.organization && project.profiles.organization.toLowerCase().includes(term))
+    );
+}
 
     if (filteredProjects.length === 0) {
         projectList.innerHTML = '<p class="placeholder-text">No projects match your search criteria.</p>';
@@ -504,6 +555,7 @@ async function loadAndDisplayProjects(user, profile, searchTerm = '', statusFilt
     }
 
     projectList.innerHTML = filteredProjects.map(project => buildProjectCard(project, user, profile)).join('');
+    console.log("All Projects:", projects);
 }
 
 function setupSearchAndFilters(user, profile) {
@@ -542,7 +594,6 @@ function setupSearchAndFilters(user, profile) {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(performSearch, 300);
     });
-}
 }
 
 async function applyToProject(projectId, user) {
@@ -679,8 +730,58 @@ async function initializeApplicationsPage(user) {
             });
         });
     }
+    await loadCollegesDropdown();
+await loadNotifications(user);
+await loadCollegesDropdown();
 }
+async function loadCollegesDropdown() {
 
+    const select = document.getElementById("filterCollege");
+ console.log("Loading colleges..."); 
+    if (!select) {
+        console.log("Dropdown not found");
+        return;
+    }
+
+    const { data, error } = await supabaseClient
+        .from("colleges")
+        .select("*");
+  console.log("DATA:", data);   // ✅ ADD THIS
+    console.log("ERROR:", error);
+    if (error) {
+        console.error("College load error:", error);
+        return;
+    }
+
+    // ✅ FIRST set default option
+    select.innerHTML = `<option value="">Select College</option>`;
+
+    // ✅ THEN append options
+    select.innerHTML += data.map(c => `
+        <option value="${c.id}">${c.name}</option>
+    `).join('');
+}
+async function filterStudents() {
+    const collegeId = document.getElementById("filterCollege").value;
+console.log("Selected college:", collegeId);
+    // 🚨 STOP IF EMPTY
+    if (!collegeId) {
+        showAlert("Please select a college first", "error");
+        return;
+    }
+
+    const { data, error } = await supabaseClient
+        .from("profiles")
+        .select("*")
+        .eq("college_id", collegeId);
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
+    console.log("Filtered students:", data);
+}
 function openReviewModal(appId, applications) {
     const app = applications.find(a => a.id == appId);
     if (!app) return;
@@ -725,7 +826,615 @@ function openReviewModal(appId, applications) {
         location.reload();
     };
 }
+async function createEvent(user) {
+    const title = document.getElementById('eventTitle').value;
+    const description = document.getElementById('eventDescription').value;
+    const date = document.getElementById('eventDate').value;
+    const link = document.getElementById('eventLink').value;
 
+    const { error } = await supabaseClient.from('events').insert([{
+        title,
+        description,
+        date,
+        link,
+        organizer_id: user.id
+    }]);
+
+    if (error) {
+        showAlert('Failed to create event', 'error');
+        return;
+    }
+
+    showAlert('Event created!', 'success');
+}
+async function registerEvent(eventId, userId) {
+    const { error } = await supabaseClient
+        .from('event_registrations')
+        .insert([{
+            event_id: eventId,
+            user_id: userId
+        }]);
+
+    if (error) {
+        showAlert('Registration failed', 'error');
+        return;
+    }
+
+    showAlert('Registered successfully!', 'success');
+}
+async function requestMentor(mentorId, user) {
+    const message = prompt("Why do you want mentorship?");
+
+    const { error } = await supabaseClient
+        .from('mentorship_requests')
+        .insert([{
+            student_user_id: user.id,
+            mentor_user_id: mentorId,
+            message,
+            expertise_area: "General"
+        }]);
+
+    if (error) {
+        showAlert('Request failed', 'error');
+        return;
+    }
+
+    showAlert('Request sent!', 'success');
+}
+async function respondToRequest(requestId, status) {
+    const { error } = await supabaseClient
+        .from('mentorship_requests')
+        .update({ status })
+        .eq('id', requestId);
+
+    if (error) {
+        showAlert('Failed to update', 'error');
+        return;
+    }
+
+    showAlert(`Request ${status}`, 'success');
+}
+async function loadMentors(user) {
+    const container = document.getElementById('mentorsList');
+
+    const { data, error } = await supabaseClient
+        .from('mentor_profiles')
+        .select('*');
+
+    if (error) {
+        console.error(error);
+        container.innerHTML = "Failed to load mentors";
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        container.innerHTML = "No mentors available";
+        return;
+    }
+
+    container.innerHTML = data.map(mentor => `
+        <div class="card">
+            <h3>${mentor.name}</h3>
+            <p>${mentor.organization}</p>
+            <p>${mentor.expertise}</p>
+
+            <button onclick="requestMentor('${mentor.user_id}', '${user.id}')"
+                class="btn btn-primary">
+                Request Mentorship
+            </button>
+        </div>
+    `).join('');
+}
+async function loadMentorshipRequests(user) {
+    const container = document.getElementById('requestsList');
+
+    const { data, error } = await supabaseClient
+        .from('mentorship_requests')
+        .select('*, profiles(name)')
+        .eq('mentor_user_id', user.id);
+
+    if (error) {
+        console.error(error);
+        container.innerHTML = "Error loading requests";
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        container.innerHTML = "No requests";
+        return;
+    }
+
+    container.innerHTML = data.map(req => `
+        <div class="card">
+            <h4>${req.profiles?.name || "Student"}</h4>
+            <p>${req.message}</p>
+            <p>Status: ${req.status}</p>
+
+            ${req.status === 'pending' ? `
+                <button onclick="respondToRequest('${req.id}', 'accepted')" class="btn btn-primary">
+                    Accept
+                </button>
+
+                <button onclick="respondToRequest('${req.id}', 'rejected')" class="btn btn-secondary">
+                    Reject
+                </button>
+            ` : ''}
+        </div>
+    `).join('');
+}
+async function loadChat(user, otherUserId) {
+    const container = document.getElementById('chatBox');
+
+    const { data, error } = await supabaseClient
+        .from('mentorship_messages')
+        .select('*')
+        .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
+        .order('created_at');
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
+    container.innerHTML = data.map(msg => `
+        <div>
+            <b>${msg.sender_id === user.id ? "You" : "Mentor"}:</b>
+            ${msg.message}
+        </div>
+    `).join('');
+}
+document.getElementById("resumeForm")?.addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const name = document.getElementById("resumeName").value;
+    const title = document.getElementById("resumeTitle").value;
+    const summary = document.getElementById("resumeSummary").value;
+    const education = document.getElementById("resumeEducation").value;
+    const experience = document.getElementById("resumeExperience").value;
+
+    const preview = `
+        <h2>${name}</h2>
+        <h4>${title}</h4>
+        <p>${summary}</p>
+
+        <h3>Education</h3>
+        <p>${education}</p>
+
+        <h3>Experience</h3>
+        <p>${experience}</p>
+    `;
+
+    document.getElementById("resumePreview").innerHTML = preview;
+
+    // 👉 ANALYSIS
+    const analysis = analyzeResume(summary + " " + experience);
+    document.getElementById("analysisResult").innerText = analysis;
+});
+function analyzeResume(text) {
+    let suggestions = [];
+
+    if (text.length < 50) {
+        suggestions.push("Add more detailed description");
+    }
+
+    if (!text.toLowerCase().includes("project")) {
+        suggestions.push("Include project experience");
+    }
+
+    if (!text.toLowerCase().includes("skill")) {
+        suggestions.push("Mention your skills clearly");
+    }
+
+    if (!text.toLowerCase().includes("intern")) {
+        suggestions.push("Add internships or practical experience");
+    }
+
+    return suggestions.length === 0
+        ? "✅ Resume looks strong!"
+        : "Suggestions:\n- " + suggestions.join("\n- ");
+}
+document.getElementById("resumeUploadForm")?.addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    const file = document.getElementById("resumeFile").files[0];
+
+    if (!file) return alert("Please select a file");
+
+    const filePath = `resumes/${user.id}_${file.name}`;
+
+    const { error } = await supabaseClient.storage
+        .from("resumes")
+        .upload(filePath, file);
+
+    if (error) {
+        console.error(error);
+        return alert("Upload failed");
+    }
+
+    const { data } = supabaseClient.storage
+        .from("resumes")
+        .getPublicUrl(filePath);
+
+    document.getElementById("resumeUploadResult").innerHTML = `
+        <a href="${data.publicUrl}" target="_blank">View Resume</a>
+    `;
+});
+async function saveResumeToDB() {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+
+    const name = document.getElementById("resumeName").value;
+    const title = document.getElementById("resumeTitle").value;
+    const summary = document.getElementById("resumeSummary").value;
+    const education = document.getElementById("resumeEducation").value;
+    const experience = document.getElementById("resumeExperience").value;
+
+    const { error } = await supabaseClient
+        .from("resumes")
+        .insert([{
+            user_id: user.id,
+            name,
+            title,
+            summary,
+            education,
+            experience
+        }]);
+
+    if (error) {
+        console.error(error);
+    }
+}
+async function analyzeSkills() {
+    const studentInput = document.getElementById("studentSkills").value;
+    const jobInput = document.getElementById("jobSkills").value;
+
+    const studentSkills = studentInput.toLowerCase().split(',').map(s => s.trim());
+    const jobSkills = jobInput.toLowerCase().split(',').map(s => s.trim());
+
+    const matched = studentSkills.filter(skill => jobSkills.includes(skill));
+    const missing = jobSkills.filter(skill => !studentSkills.includes(skill));
+
+    let result = `
+        <h3>Analysis Result</h3>
+
+        <p>✅ Matching Skills: ${matched.join(", ") || "None"}</p>
+        <p>❌ Missing Skills: ${missing.join(", ") || "None"}</p>
+    `;
+
+    // 👉 Get course recommendations
+    const courses = await getCourseRecommendations(missing);
+
+    result += `
+        <h4>📚 Recommended Courses:</h4>
+        ${courses}
+    `;
+
+    document.getElementById("skillResult").innerHTML = result;
+}
+async function getCourseRecommendations(missingSkills) {
+    if (missingSkills.length === 0) return "No courses needed 🎉";
+
+    const { data, error } = await supabaseClient
+        .from("courses")
+        .select("*");
+
+    console.log("Courses:", data);
+    console.log("Error:", error);
+
+    if (error) {
+        console.error(error);
+        return "Failed to load courses";
+    }
+
+    if (!data || data.length === 0) {
+        return "No courses found in database";
+    }
+
+    const matchedCourses = data.filter(course =>
+        missingSkills.some(skill =>
+            course.skills?.toLowerCase().includes(skill)
+        )
+    );
+
+    if (matchedCourses.length === 0) return "No matching courses found";
+
+    return matchedCourses.map(c => `
+        <div>
+            <b>${c.title}</b>  
+            <a href="${c.link}" target="_blank">View</a>
+        </div>
+    `).join('');
+}
+function analyzeSkillsFromProject(requiredSkills) {
+    document.getElementById("jobSkills").value = requiredSkills;
+    analyzeSkills();
+}
+function handleSendMessage(user, otherUserId) {
+    const input = document.getElementById('chatInput');
+    const text = input.value;
+
+    if (!text) return;
+
+    sendMessage(otherUserId, user, text);
+    input.value = '';
+
+    setTimeout(() => loadChat(user, otherUserId), 500);
+}
+async function scheduleInterview(studentId, projectId, user) {
+    const time = prompt("Enter interview date & time (YYYY-MM-DD HH:MM)");
+    const link = prompt("Enter meeting link (Zoom/Meet)");
+
+    const { error } = await supabaseClient
+        .from('interviews')
+        .insert([{
+            student_id: studentId,
+            company_id: user.id,
+            project_id: projectId,
+            interview_time: time,
+            meeting_link: link
+        }]);
+
+    if (error) {
+        console.error(error);
+        showAlert("Failed to schedule interview", "error");
+        return;
+    }
+
+    showAlert("Interview scheduled successfully", "success");
+}
+async function createPost() {
+    const title = document.getElementById("postTitle").value;
+    const content = document.getElementById("postContent").value;
+
+    const { data: { user } } = await supabaseClient.auth.getUser();
+
+    const { error } = await supabaseClient
+        .from("posts")
+        .insert([{
+            user_id: user.id,
+            title,
+            content
+        }]);
+
+    if (error) {
+        showAlert("Failed to post", "error");
+        return;
+    }
+
+    showAlert("Posted successfully!", "success");
+    loadPosts();
+}
+async function loadPosts() {
+    const container = document.getElementById("forumThreads");
+
+    const { data, error } = await supabaseClient
+        .from("posts")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        container.innerHTML = "Error loading posts";
+        return;
+    }
+
+    container.innerHTML = data.map(post => `
+        <div class="card">
+            <h3>${post.title}</h3>
+            <p>${post.content}</p>
+
+            <input id="reply-${post.id}" placeholder="Write reply...">
+            <button onclick="addReply('${post.id}')">Reply</button>
+
+            <div id="replies-${post.id}"></div>
+        </div>
+    `).join('');
+
+    data.forEach(post => loadReplies(post.id));
+}
+async function addReply(postId) {
+    const input = document.getElementById(`reply-${postId}`);
+    const text = input.value;
+
+    const { data: { user } } = await supabaseClient.auth.getUser();
+
+    const { error } = await supabaseClient
+        .from("replies")
+        .insert([{
+            post_id: postId,
+            user_id: user.id,
+            content: text
+        }]);
+
+    if (error) {
+        showAlert("Reply failed", "error");
+        return;
+    }
+
+    input.value = "";
+    loadReplies(postId);
+}
+async function loadReplies(postId) {
+    const container = document.getElementById(`replies-${postId}`);
+
+    const { data, error } = await supabaseClient
+        .from("replies")
+        .select("*")
+        .eq("post_id", postId)
+        .order("created_at");
+
+    if (error) {
+        container.innerHTML = "Error loading replies";
+        return;
+    }
+
+    container.innerHTML = data.map(r => `
+        <p>💬 ${r.content}</p>
+    `).join('');
+}
+async function sendMessage(receiverId, user, text) {
+    await supabaseClient.from('mentorship_messages').insert([{
+        sender_id: user.id,
+        receiver_id: receiverId,
+        message: text
+    }]);
+}
+async function loadMessages(user, otherUserId) {
+    const { data } = await supabaseClient
+        .from('mentorship_messages')
+        .select('*')
+        .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
+        .order('created_at');
+
+    console.log(data);
+}
+async function markAttendance(eventId, user) {
+    const { error } = await supabaseClient
+        .from('event_attendance')
+        .insert([{
+            event_id: eventId,
+            user_id: user.id
+        }]);
+
+    if (error) {
+        showAlert('Attendance failed', 'error');
+        return;
+    }
+
+    showAlert('Attendance marked!', 'success');
+}
+async function loadNotifications(user) {
+    const container = document.getElementById("notificationsList");
+    const countEl = document.getElementById("notifCount");
+
+    const { data, error } = await supabaseClient
+        .from("notifications")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+
+    if (error || !data.length) {
+        container.innerHTML = "<p>No notifications</p>";
+        countEl.innerText = 0;
+        return;
+    }
+
+    // ✅ count unread
+    const unread = data.filter(n => !n.is_read).length;
+    countEl.innerText = unread;
+
+    container.innerHTML = data.map(n => `
+        <div class="card ${n.is_read ? '' : 'unread'}"
+             onclick="markAsRead('${n.id}')">
+            <p>${n.message}</p>
+            <small>${new Date(n.created_at).toLocaleString()}</small>
+        </div>
+    `).join("");
+}
+async function markAsRead(id) {
+    await supabaseClient
+        .from("notifications")
+        .update({ is_read: true })
+        .eq("id", id);
+
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    loadNotifications(user);
+}
+function toggleNotif() {
+    document.getElementById("notifPanel").classList.toggle("hidden");
+}
+async function loadColleges() {
+    const { data } = await supabaseClient
+        .from("colleges")
+        .select("*");
+
+    document.getElementById("collegeSelect").innerHTML =
+        data.map(c => `
+            <option value="${c.id}">${c.name}</option>
+        `).join('');
+}
+async function saveCollege() {
+    const collegeId = document.getElementById("collegeSelect").value;
+
+    const { data: { user } } = await supabaseClient.auth.getUser();
+
+    await supabaseClient
+        .from("profiles")
+        .update({ college_id: collegeId })
+        .eq("id", user.id);
+
+    alert("College saved!");
+}
+async function loadStudents() {
+    const { data } = await supabaseClient
+        .from("profiles")
+        .select("*, colleges(name)");
+
+    console.log(data);
+}
+async function filterStudents() {
+    const collegeId = document.getElementById("filterCollege").value;
+
+    const { data } = await supabaseClient
+        .from("profiles")
+        .select("*")
+        .eq("college_id", collegeId);
+
+    console.log(data);
+}
+async function getAttendance(eventId) {
+    const { data } = await supabaseClient
+        .from('event_attendance')
+        .select('*')
+        .eq('event_id', eventId);
+
+    console.log("Attended:", data.length);
+}
+async function loadAndDisplayEvents(user, profile) {
+    const list = document.getElementById('eventsList');
+
+    const { data: events, error } = await supabaseClient
+        .from('events')
+        .select('*')
+        .order('date', { ascending: true });
+
+    if (error) {
+        console.error(error);
+        showAlert('Failed to load events', 'error');
+        return;
+    }
+
+    if (!events || events.length === 0) {
+        list.innerHTML = '<p>No events available</p>';
+        return;
+    }
+
+    list.innerHTML = events.map(event => {
+        const eventDate = new Date(event.date);
+        const isUpcoming = eventDate > new Date();
+
+        return `
+            <article class="event-card">
+                <h3>${event.title}</h3>
+                <p>${event.description}</p>
+                <small>${eventDate.toLocaleString()}</small>
+
+                <small>
+                    <a href="${event.link}" target="_blank">Join Link</a>
+                </small>
+
+                ${
+                    isUpcoming
+                    ? `<button onclick="registerEvent('${event.id}', '${user.id}')" class="btn btn-primary">
+                            Register
+                       </button>`
+                    : `<button onclick="markAttendance('${event.id}', '${user.id}')" class="btn btn-secondary">
+                            Mark Attendance
+                       </button>`
+                }
+            </article>
+        `;
+    }).join('');
+}
 async function initializeCoursesPage(user) {
     const profile = await fetchProfile(user.id);
     const list = document.getElementById('coursesList');
@@ -1019,9 +1728,11 @@ async function initializeTestsPage(user) {
                     <input type="text" id="testTitle" placeholder="Assessment title" required>
                     <label for="testDescription">Description</label>
                     <textarea id="testDescription" placeholder="Brief description of the assessment" required></textarea>
+                    <div id="questionList" class="question-list"></div>
+                    <button type="button" id="addQuestionBtn" class="btn btn-secondary">Add question</button>
                     <button type="submit" class="btn btn-primary">Publish test</button>
                 </form>
-                <button type="button" id="createSampleTestBtn" class="btn btn-secondary">Create sample test</button>
+                <button type="button" id="createSampleTestBtn" class="btn btn-ghost">Create sample test</button>
             </div>
         `;
         setupTestCreation(user);
@@ -1055,15 +1766,88 @@ async function populateTestFilterDropdown() {
     testFilter.innerHTML = `<option value="all">All Tests</option>${options}`;
 }
 
+function createQuestionBlock(index) {
+    return `
+        <div class="question-card" data-question-index="${index}">
+            <div class="form-group">
+                <label>Question ${index + 1}</label>
+                <input type="text" class="question-text" placeholder="Enter question text" required>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Option A</label>
+                    <input type="text" class="option-input" data-option="A" placeholder="Option A" required>
+                </div>
+                <div class="form-group">
+                    <label>Option B</label>
+                    <input type="text" class="option-input" data-option="B" placeholder="Option B" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Option C</label>
+                    <input type="text" class="option-input" data-option="C" placeholder="Option C" required>
+                </div>
+                <div class="form-group">
+                    <label>Option D</label>
+                    <input type="text" class="option-input" data-option="D" placeholder="Option D" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Correct answer</label>
+                <select class="correct-answer" required>
+                    <option value="">Select correct answer</option>
+                    <option value="A">Option A</option>
+                    <option value="B">Option B</option>
+                    <option value="C">Option C</option>
+                    <option value="D">Option D</option>
+                </select>
+            </div>
+            <button type="button" class="btn btn-ghost remove-question-btn">Remove question</button>
+        </div>
+    `;
+}
+
+function addQuestionBlock() {
+    const container = document.getElementById('questionList');
+    if (!container) return;
+    const index = container.querySelectorAll('.question-card').length;
+    container.insertAdjacentHTML('beforeend', createQuestionBlock(index));
+}
+
 async function setupTestCreation(user) {
     const form = document.getElementById('testCreateForm');
     const sampleBtn = document.getElementById('createSampleTestBtn');
+    const addQuestionBtn = document.getElementById('addQuestionBtn');
+    const questionList = document.getElementById('questionList');
 
     if (sampleBtn) {
         sampleBtn.addEventListener('click', async () => {
             await createSampleTest(user);
         });
     }
+
+    if (addQuestionBtn) {
+        addQuestionBtn.addEventListener('click', () => {
+            addQuestionBlock();
+        });
+    }
+
+    if (questionList && questionList.children.length === 0) {
+        addQuestionBlock();
+    }
+
+    questionList?.addEventListener('click', event => {
+        const target = event.target.closest('.remove-question-btn');
+        if (!target) return;
+        const card = target.closest('.question-card');
+        card?.remove();
+        const remaining = document.querySelectorAll('#questionList .question-card');
+        remaining.forEach((card, idx) => {
+            const label = card.querySelector('label');
+            if (label) label.textContent = `Question ${idx + 1}`;
+        });
+    });
 
     if (!form) return;
     form.addEventListener('submit', async event => {
@@ -1072,21 +1856,67 @@ async function setupTestCreation(user) {
 
         const title = document.getElementById('testTitle')?.value.trim();
         const description = document.getElementById('testDescription')?.value.trim();
+        const questionCards = Array.from(document.querySelectorAll('#questionList .question-card'));
 
         if (!title || !description) {
             showAlert('Please enter a title and description for the test.', 'error');
             return;
         }
 
-        const { error } = await supabaseClient.from('tests').insert([{ title, description }]);
-        if (error) {
-            console.error('Test creation failed:', error);
+        if (!questionCards.length) {
+            showAlert('Add at least one question to create a test.', 'error');
+            return;
+        }
+
+        const questions = [];
+        for (const card of questionCards) {
+            const questionText = card.querySelector('.question-text')?.value.trim();
+            const optionInputs = Array.from(card.querySelectorAll('.option-input'));
+            const correctAnswer = card.querySelector('.correct-answer')?.value;
+            if (!questionText || optionInputs.some(input => !input.value.trim()) || !correctAnswer) {
+                showAlert('All questions must include text, four options, and a correct answer.', 'error');
+                return;
+            }
+
+            const options = optionInputs.map(input => input.value.trim());
+            const answerIndex = ['A', 'B', 'C', 'D'].indexOf(correctAnswer);
+            questions.push({
+                question: questionText,
+                options,
+                correct_answer: options[answerIndex] || '',
+            });
+        }
+
+        const { data: testData, error: testError } = await supabaseClient
+            .from('tests')
+            .insert([{ title, description }])
+            .select()
+            .single();
+
+        if (testError || !testData?.id) {
+            console.error('Test creation failed:', testError);
             showAlert('Unable to publish the test.', 'error');
             return;
         }
 
-        showAlert('Test published successfully.', 'success');
+        const questionsToInsert = questions.map(question => ({
+            test_id: testData.id,
+            question: question.question,
+            options: question.options,
+            correct_answer: question.correct_answer,
+        }));
+
+        const { error: questionsError } = await supabaseClient.from('questions').insert(questionsToInsert);
+        if (questionsError) {
+            console.error('Question insert failed:', questionsError);
+            showAlert('Test created but question saving failed.', 'error');
+            return;
+        }
+
+        showAlert('Test and questions created successfully.', 'success');
         form.reset();
+        questionList.innerHTML = '';
+        addQuestionBlock();
         await initializeTestsPage(user);
     });
 }
@@ -1838,63 +2668,75 @@ async function loadMentorActiveMentorships(user) {
     `).join('');
 }
 
-async function loadStudentActiveMentorships(user) {
-    const panel = document.getElementById('activeMentorshipsPanel');
-    const list = panel.querySelector('#mentorshipsList');
+async function loadAndDisplayProjects(user, profile, searchTerm = '', statusFilter = 'all', sortBy = 'newest') {
+    const projectList = document.getElementById('projectsList');
 
-    const { data: mentorships, error } = await supabaseClient
-        .from('mentorship_requests')
-        .select('*, mentor_profiles(name, organization)')
-        .eq('student_user_id', user.id);
+    let query = supabaseClient
+        .from('projects')
+        .select('*, profiles(name, organization)');
 
-    if (error || !mentorships || mentorships.length === 0) {
-        list.innerHTML = '<p class="placeholder-text">No active mentorships. Start by browsing mentors!</p>';
+    // Sorting
+    switch (sortBy) {
+        case 'oldest':
+            query = query.order('created_at', { ascending: true });
+            break;
+        case 'deadline':
+            query = query.order('deadline', { ascending: true, nullsLast: true });
+            break;
+        default:
+            query = query.order('created_at', { ascending: false });
+    }
+
+    const { data: projects, error } = await query;
+
+    console.log("Projects from DB:", projects);
+
+    if (error) {
+        console.error('Projects fetch failed:', error);
+        projectList.innerHTML = '<p class="placeholder-text">Unable to load projects.</p>';
         return;
     }
 
-    const grouped = {
-        pending: mentorships.filter(m => m.status === 'pending'),
-        accepted: mentorships.filter(m => m.status === 'accepted'),
-        rejected: mentorships.filter(m => m.status === 'rejected'),
-    };
-
-    let html = '';
-
-    if (grouped.pending.length > 0) {
-        html += '<h3 style="margin-top: 20px;">Pending requests</h3>';
-        html += grouped.pending.map(m => `
-            <article class="mentorship-item pending">
-                <h4>${m.mentor_profiles?.name}</h4>
-                <small>Organization: ${m.mentor_profiles?.organization}</small>
-                <small>Requested: ${new Date(m.created_at).toLocaleDateString()}</small>
-                <span class="status-badge pending">Awaiting acceptance</span>
-            </article>
-        `).join('');
+    if (!projects || projects.length === 0) {
+        projectList.innerHTML = '<p class="placeholder-text">No active projects found.</p>';
+        return;
     }
 
-    if (grouped.accepted.length > 0) {
-        html += '<h3 style="margin-top: 20px;">Active mentorships</h3>';
-        html += grouped.accepted.map(m => `
-            <article class="mentorship-item">
-                <h4>${m.mentor_profiles?.name}</h4>
-                <small>Organization: ${m.mentor_profiles?.organization}</small>
-                <small>Connected: ${new Date(m.created_at).toLocaleDateString()}</small>
-                <button type="button" class="btn btn-secondary open-messaging-btn" data-mentorship-id="${m.id}" data-mentor-name="${m.mentor_profiles?.name}" data-mentor-id="${m.mentor_user_id}">Open chat</button>
-            </article>
-        `).join('');
+    let filteredProjects = projects;
+
+    // Status filter
+    if (statusFilter === 'active') {
+        const now = new Date();
+        filteredProjects = filteredProjects.filter(project =>
+            !project.deadline || new Date(project.deadline) > now
+        );
+    } else if (statusFilter === 'deadline') {
+        filteredProjects = filteredProjects.filter(project => project.deadline);
     }
 
-    if (grouped.rejected.length > 0) {
-        html += '<h3 style="margin-top: 20px;">Not accepted</h3>';
-        html += grouped.rejected.map(m => `
-            <article class="mentorship-item rejected">
-                <h4>${m.mentor_profiles?.name}</h4>
-                <small>Status: Not available at this time</small>
-            </article>
-        `).join('');
+    // ✅ FIXED SEARCH FILTER (SAFE)
+    if (searchTerm && searchTerm.trim() !== '') {
+        const term = searchTerm.toLowerCase().trim();
+
+        filteredProjects = filteredProjects.filter(project =>
+            (project.title && project.title.toLowerCase().includes(term)) ||
+            (project.description && project.description.toLowerCase().includes(term)) ||
+            (project.profiles?.name && project.profiles.name.toLowerCase().includes(term)) ||
+            (project.profiles?.organization && project.profiles.organization.toLowerCase().includes(term))
+        );
     }
 
-    list.innerHTML = html || '<p class="placeholder-text">No mentorship history.</p>';
+    if (filteredProjects.length === 0) {
+        projectList.innerHTML = '<p class="placeholder-text">No projects match your search criteria.</p>';
+        return;
+    }
+
+    // Render
+    projectList.innerHTML = filteredProjects
+        .map(project => buildProjectCard(project, user, profile))
+        .join('');
+
+    console.log("Filtered Projects:", filteredProjects);
 }
 
 async function requestMentorship(mentorId, mentorName, user) {
@@ -2240,22 +3082,69 @@ function updateResumePreview(data) {
     `;
 }
 
-function initializeResumePage() {
+async function initializeResumePage(user) {
     const form = document.getElementById('resumeForm');
-    if (!form) return;
+    const uploadForm = document.getElementById('resumeUploadForm');
+    const uploadResult = document.getElementById('resumeUploadResult');
+    const profile = await fetchProfile(user.id);
 
-    form.addEventListener('submit', event => {
-        event.preventDefault();
-        const data = {
-            name: document.getElementById('resumeName')?.value.trim(),
-            title: document.getElementById('resumeTitle')?.value.trim(),
-            summary: document.getElementById('resumeSummary')?.value.trim(),
-            education: document.getElementById('resumeEducation')?.value.trim(),
-            experience: document.getElementById('resumeExperience')?.value.trim(),
-        };
-        updateResumePreview(data);
-        showAlert('Resume preview updated.', 'success');
-    });
+    if (uploadResult) {
+        uploadResult.innerHTML = profile?.resume_url
+            ? `<article class="panel-item"><h3>Uploaded Resume</h3><p><a href="${profile.resume_url}" target="_blank">View uploaded resume</a></p></article>`
+            : '<p class="placeholder-text">No resume uploaded yet.</p>';
+    }
+
+    if (form) {
+        form.addEventListener('submit', event => {
+            event.preventDefault();
+            const data = {
+                name: document.getElementById('resumeName')?.value.trim(),
+                title: document.getElementById('resumeTitle')?.value.trim(),
+                summary: document.getElementById('resumeSummary')?.value.trim(),
+                education: document.getElementById('resumeEducation')?.value.trim(),
+                experience: document.getElementById('resumeExperience')?.value.trim(),
+            };
+            updateResumePreview(data);
+            showAlert('Resume preview updated.', 'success');
+        });
+    }
+
+    if (uploadForm) {
+        uploadForm.addEventListener('submit', async event => {
+            event.preventDefault();
+            clearAlert();
+
+            const file = document.getElementById('resumeFile')?.files?.[0];
+            if (!file) {
+                showAlert('Please select a PDF file to upload.', 'error');
+                return;
+            }
+
+            const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+            if (!isPdf) {
+                showAlert('Only PDF files are allowed.', 'error');
+                return;
+            }
+
+            try {
+                const resumeUrl = await uploadResumeFile(user, file);
+                const { error: saveError } = await supabaseClient.from('profiles').upsert({ id: user.id, resume_url: resumeUrl });
+                if (saveError) {
+                    throw saveError;
+                }
+
+                if (uploadResult) {
+                    uploadResult.innerHTML = `<article class="panel-item"><h3>Uploaded Resume</h3><p><a href="${resumeUrl}" target="_blank">View uploaded resume</a></p></article>`;
+                }
+
+                showAlert('Upload successful.', 'success');
+                uploadForm.reset();
+            } catch (error) {
+                console.error('Resume upload failed:', error);
+                showAlert(error?.message || 'Upload failed. Please try again.', 'error');
+            }
+        });
+    }
 }
 
 async function initializeForumPage(user) {
@@ -2369,19 +3258,19 @@ async function uploadResumeFile(user, file) {
     const filePath = `resumes/${user.id}_${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
     const { data, error } = await supabaseClient.storage.from('resumes').upload(filePath, file, {
         cacheControl: '3600',
-        upsert: true,
+        upsert: false,
     });
 
     if (error) {
         throw error;
     }
 
-    const { data: signedUrlData, error: urlError } = await supabaseClient.storage.from('resumes').createSignedUrl(data.path, 60 * 60 * 24 * 7);
+    const { data: urlData, error: urlError } = await supabaseClient.storage.from('resumes').getPublicUrl(filePath);
     if (urlError) {
         throw urlError;
     }
 
-    return signedUrlData.signedUrl;
+    return urlData.publicUrl;
 }
 
 async function savePortfolioItem(user, title, description, link) {
@@ -2390,13 +3279,23 @@ async function savePortfolioItem(user, title, description, link) {
         return false;
     }
 
-    const { error } = await supabaseClient.from('portfolio').insert([{ student_id: user.id, title, description, link }]);
-    if (error) {
-        console.error('Portfolio save failed:', error);
-        showAlert('Unable to save portfolio item.', 'error');
-        return false;
-    }
+    const { error } = await supabase.from('portfolio').insert({
+  student_id: user.id,
+  title,
+  description,
+  link
+});
 
+if (error) {
+  console.error(error);
+  showAlert("Unable to save portfolio item", "error");
+} else {
+  showAlert("Portfolio saved!", "success");
+
+  // ✅ ADD THESE TWO LINES
+  await loadPortfolio(user.id);
+  await loadProfile(user.id);
+}
     return true;
 }
 
@@ -2410,7 +3309,36 @@ async function saveResumeUrl(user, resumeUrl) {
 
     return true;
 }
+async function addNotification(userId, message, type) {
+    await supabaseClient
+        .from("notifications")
+        .insert([{
+            user_id: userId,
+            message: message,
+            type: type
+        }]);
+}
+async function loadNotifications(user) {
+    const container = document.getElementById("notificationsList");
 
+    const { data, error } = await supabaseClient
+        .from("notifications")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+
+    if (error || !data.length) {
+        container.innerHTML = "<p>No notifications</p>";
+        return;
+    }
+
+    container.innerHTML = data.map(n => `
+        <div class="card">
+            <p>${n.message}</p>
+            <small>${new Date(n.created_at).toLocaleString()}</small>
+        </div>
+    `).join("");
+}
 async function initializeProfilePage(user) {
     const profile = await fetchProfile(user.id);
     const meta = user.user_metadata || {};
@@ -2500,28 +3428,27 @@ async function initializeProfilePage(user) {
 
     const { data: portfolioItems, error } = await supabaseClient.from('portfolio').select('*').eq('student_id', user.id);
     if (error || !portfolioItems.length) {
-        portfolio.innerHTML = '<p class="placeholder-text">No portfolio items added yet.</p>';
-        return;
-    }
-
-    portfolio.innerHTML = portfolioItems.map(item => `
-        <article class="panel-item">
-            <h3>${item.title}</h3>
-            <p>${item.description}</p>
-            <small><a href="${item.link}" target="_blank">View link</a></small>
-        </article>
-    `).join('');
+    portfolio.innerHTML = '<p class="placeholder-text">No portfolio items added yet.</p>';
+    return;
 }
 
+portfolio.innerHTML = portfolioItems.map(item => `
+    <article class="panel-item">
+        <h3>${item.title}</h3>
+        <p>${item.description}</p>
+        <small><a href="${item.link}" target="_blank">View link</a></small>
+    </article>
+`).join('');
+loadCertificates();
+loadAchievements();
+}
 async function initializePage() {
     const user = await ensurePageAccess();
     const page = getPageName();
     const logoutButton = document.getElementById('logoutBtn');
-
     if (logoutButton) {
         logoutButton.addEventListener('click', handleLogout);
     }
-
     if (page === 'login.html') return initializeLoginPage();
     if (page === 'signup.html') return initializeSignupPage();
     if (page === 'dashboard.html' && user) return initializeDashboardPage(user);
@@ -2624,4 +3551,9 @@ document.addEventListener('click', async event => {
     if (target.matches('.hackathon-register-btn')) {
         await registerHackathon(target.dataset.hackathonId, user);
     }
+    // ✅ LOAD FORUM PAGE
+if (window.location.pathname.includes("forum.html")) {
+    loadPosts();
+}
 });
+

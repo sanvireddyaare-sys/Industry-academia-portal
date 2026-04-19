@@ -8,17 +8,35 @@
 </head>
 <body>
     <nav class="main-nav">
+    <div class="nav-container">
+
+        <!-- Logo -->
         <div class="nav-brand">Industry Academia Portal</div>
+
+        <!-- Links -->
         <div class="nav-links">
             <a href="dashboard.html">Dashboard</a>
             <a href="projects.html">Projects</a>
+            <a href="applications.html">Applications</a>
             <a href="courses.html">Courses</a>
             <a href="tests.html">Tests</a>
             <a href="events.html">Events</a>
+            <a href="mentorship.html">Mentorship</a>
+            <a href="resume.html">Resume</a>
+            <a href="forum.html">Forum</a>
             <a href="profile.html">Profile</a>
         </div>
-        <button id="logoutBtn" class="btn btn-ghost">Logout</button>
-    </nav>
+
+        <!-- Right Side -->
+        <div class="nav-right">
+            <div class="notification-box" onclick="toggleNotif()">
+                🔔 <span id="notifCount" class="badge">0</span>
+            </div>
+            <button id="logoutBtn" class="btn btn-ghost">Logout</button>
+        </div>
+
+    </div>
+</nav>
 
     <main class="page-wrap">
         <div id="pageAlert" class="alert alert-info"></div>
@@ -30,7 +48,6 @@
                 <p>Keep your academic profile up to date and share your portfolio with recruiters.</p>
             </div>
         </section>
-
         <section class="content-grid">
             <div class="profile-panel card">
                 <h2>Account details</h2>
@@ -58,9 +75,52 @@
                 <div id="portfolioList" class="panel-list"></div>
             </div>
         </section>
-    </main>
+        <section class="card">
+    <h2>Skill Gap Analysis</h2>
 
+    <label>Your Skills</label>
+    <input id="studentSkills" placeholder="e.g. html,css,js" />
+
+    <label>Job Required Skills</label>
+    <input id="jobSkills" placeholder="e.g. react,nodejs" />
+
+    <button onclick="analyzeSkills()" class="btn btn-primary">
+        Analyze
+    </button>
+
+    <div id="skillResult"></div>
+</section>
+<section class="card">
+    <h2>Certificates</h2>
+
+    <input id="certTitle" placeholder="Certificate name">
+    <input id="certLink" placeholder="Certificate URL">
+
+    <button onclick="addCertificate()" class="btn btn-secondary">
+        Add Certificate
+    </button>
+
+    <div id="certList"></div>
+</section>
+<section class="card">
+    <h2>Achievements</h2>
+
+    <input id="achTitle" placeholder="Achievement title">
+    <textarea id="achDesc" placeholder="Description"></textarea>
+
+    <button onclick="addAchievement()" class="btn btn-secondary">
+        Add Achievement
+    </button>
+
+    <div id="achList"></div>
+</section>
+<section class="card">
+    <h2>Your Portfolio</h2>
+    <div id="portfolioList"></div>
+</section>
+    </main>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
